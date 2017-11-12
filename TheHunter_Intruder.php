@@ -43,8 +43,7 @@ Class TheHunter{
   	   * Le digo al cliente que yo soy el AP y todo el tráfico pasa a traves de mí. Me retorna el PID para
   	   * luego poder matar el proceso en el caso de que el administrador lo autentifique.
        */
-  	  if((preg_match('/(\d+\.\d+\.\d+\.\d+\/\d+)/', $user_ip)) && (preg_match('/(\d+\.\d+\.\d+\.\d+\/\d+)/', $ap_ip)) ){
-
+  	  if((preg_match('/(\d+\.\d+\.\d+\.\d+)/', $user_ip)) && (preg_match('/(\d+\.\d+\.\d+\.\d+)/', $ap_ip)) ){
   	    $command = "nohup arpspoof -i wlp2s0 -t ".$user_ip." ".$ap_ip." > /dev/null 2>&1 & echo $!";
   	    $command = trim(preg_replace('/\s\s+/', ' ', $command));
     
@@ -58,6 +57,7 @@ Class TheHunter{
       print 'Error ' . $exception -> getMessage(); 
     } 
 
+    echo "{".$command."} con PID ".$pid."\n";
     return $pid;
   }
 

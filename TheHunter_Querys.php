@@ -141,13 +141,34 @@ Class HQuery{
 
   // *Función que valida si un cliente esta en la lista de bloqueados o admitidos (ninguna de estas-> Nuevo Cliente).
   public function valNewClient($user_ip,$user_mac){
-  	$returned = 0;
-  	
-  	$db = $this->database();
+    $val = 0;
+
+    if(($this->searchIn($user_ip,$user_mac,"blocks") == 0) && ($this->searchIn($user_ip,$user_mac,"friends") == 0) && ($this->searchIn($user_ip,$user_mac,"intruders") == 0)){
+      $val = 1;
+    }else{
+      $val = 0;
+    }
+    
+    return $val;
+  }
+
+
+
+
+  public function searchIn($user_ip,$user_mac,$where){
+    $returned = 0;
+    
+    $db = $this->database();
 
     try{    
-
-      $query = "SELECT 1 FROM Blocks WHERE ip=:ip AND mac=:mac LIMIT 1";
+      
+      if(strcmp($where, "blocks") == 0){
+        $query = "SELECT 1 FROM Blocks WHERE ip=:ip AND mac=:mac LIMIT 1";
+      }elseif(strcmp($where, "friends") == 0){
+        $query = "SELECT 1 FROM Friends WHERE ip=:ip AND mac=:mac LIMIT 1";
+      }elseif(strcmp($where, "intruders") == 0){
+        $query = "SELECT 1 FROM Intruders WHERE ip=:ip AND mac=:mac LIMIT 1";
+      }
 
       $statement = $db->prepare($query);
 
@@ -159,9 +180,9 @@ Class HQuery{
       $resultado = $statement->fetch();
 
       if($resultado[1] == 1){
-      	$returned = 1;
+        $returned = 1;
       }else{
-      	$returned = 0;
+        $returned = 0;
       }
 
     }catch(PDOException $exception){
@@ -173,7 +194,6 @@ Class HQuery{
      
     return $returned;
   }
-
 
 
   // *Función que mueve a un cliente a la WhiteList o a la Blacklist.

