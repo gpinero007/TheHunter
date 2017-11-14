@@ -139,6 +139,7 @@ if(preg_match('/(\d+\.\d+\.\d+\.\d+\/\d+)/', $ip_to_nmap)){
   	    $resultval = $HQuery->valNewClient($user_data[1][$i],$user_data[2][$i]);
   	    if($resultval == 1){
           echo "\nNew User con IP (".$user_data[1][$i].") y MAC (".$user_data[2][$i].") con Marca (".$user_data[3][$i].")\n";
+          
           // ArpSpoofing al nuevo cliente.
   	  	  $pid = $Hunter->makeArpSpoofing($user_data[1][$i]);
 
@@ -166,6 +167,8 @@ if(preg_match('/(\d+\.\d+\.\d+\.\d+\/\d+)/', $ip_to_nmap)){
       $replyMarkup = json_encode($replyMarkup);
       $Bot->sendMessageBoard(MYID,"👉 Selecciona una opción:",$replyMarkup);
       $replyMarkup = json_decode($replyMarkup,true);
+      
+      // Desactivando el flag y restaurando la variable que almacena el teclado.
       $flag =false;
       unset($replyMarkup);
       $replyMarkup = array(
