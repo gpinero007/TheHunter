@@ -11,9 +11,9 @@
  *#############################################################*/
 
 define('TELEGRAMWEB', 'https://api.telegram.org/bot');
-define('TOKEN', '495885526:AAEvwnYpxrkwYWuazTP8f_z1MTSWr1_KZZM');
+define('TOKEN', '');
 define('TELTIMEOUT', 20);
-define('MYID', '152434382');
+define('MYID', '');
 define('AUTOR', 'SECURY');
 
 include('TheHunter_Querys.php');
@@ -55,9 +55,48 @@ Class Bot{
             		break;
             	
             	case '/help':
-            		$msghelp = "Por ahora no hay comandos relevantes, haga uso de los botones.";
+            		$msghelp = "🤖 Comandos disponibles:\n - /verificar <ip> # Añade un Cliente a la WhiteList\n- /denegar <ip> # Añade un Cliente a la BlackList\n- /cazar <ip> # Analiza al objetivo seleccionado\n- /whitelist # Muestra IP's Amigas\n- /blocked # Muestra IP's bloqueadas\n- /blacklist # Muestra IP's Intrusas\n";
             		$this->sendMessage(MYID,$msghelp);
             		break;
+
+              case '/whitelist':
+                // Devuelve de la Base de Datos, las IP's de los Intrusos.
+                $friendsIps = $Query->dumpFrom("whitelist");
+
+                if($friendsIps == null){
+                  $msg = "🤷🏼‍♂️ No hay Clientes en la WhiteList\n";
+                }else{
+                  $msg = "🕵🏻 Consultando la lista de Conocidos...\n";
+                  $msg = $msg.$friendsIps;
+                }
+                $this->sendMessage(MYID,$msg);
+                break;
+
+              case '/blocked':
+                // Devuelve de la Base de Datos, las IP's de los Intrusos.
+                $blockIps = $Query->dumpFrom("blocks");
+
+                if($blockIps == null){
+                  $msg = "🤷🏼‍♂️ No hay Clientes en la Lista de Espera de Verificación\n";
+                }else{
+                  $msg = "🕵🏻 Consultando la lista de espera de verificacion...\n";
+                  $msg = $msg.$blockIps;
+                }
+                $this->sendMessage(MYID,$msg);
+                break;  
+
+              case '/blacklist':
+                // Devuelve de la Base de Datos, las IP's de los Intrusos.
+                $blackIps = $Query->dumpFrom("blacklist");
+
+                if($blackIps == null){
+                  $msg = "🤷🏼‍♂️ No hay clientes en la Lista de Intrusos\n";
+                }else{
+                  $msg = "🕵🏻 Consultando la lista de Intrusos...\n";
+                  $msg = $msg.$blackIps;
+                }
+                $this->sendMessage(MYID,$msg);
+                break;  
 
             	default:
             	  /*
@@ -66,7 +105,7 @@ Class Bot{
             	   *   2. Denegar: mueve de tabla al cliente hacia la Blacklist.
             	   *   3. Cazar: empieza la caza, el objetivo ha empezado a correr.
             	   */
-            		if(preg_match('/✅\s+Verificar\s+(\d+\.\d+\.\d+\.\d+)/',$update['message']['text'])){
+            		if(preg_match('/\/verificar\s+(\d+\.\d+\.\d+\.\d+)/',$update['message']['text'])){
 
             		  preg_match_all('/(\d+\.\d+\.\d+\.\d+)/',$update['message']['text'], $matches);
 
@@ -77,7 +116,7 @@ Class Bot{
                       $Hunter->stopPoisoning($pid);
                       $this->sendMessage(MYID,"Cliente Verificado 👍🏻");
 
-            		}else if(preg_match('/🚫\s+Denegar\s+(\d+\.\d+\.\d+\.\d+)/', $update['message']['text'])){
+            		}else if(preg_match('/\/denegar\s+(\d+\.\d+\.\d+\.\d+)/', $update['message']['text'])){
                       
             		  preg_match_all('/(\d+\.\d+\.\d+\.\d+)/',$update['message']['text'], $matches);            			
 
@@ -86,7 +125,7 @@ Class Bot{
                       $Query->deleteTo($matches[0][0],"blocks");
                       $this->sendMessage(MYID,"Cliente enviado a la Blacklist 👍🏻");
 
-            		}else if(preg_match('/😈\sEmpieza\sla\scaza\sde\s(\d+\.\d+\.\d+\.\d+)/', $update['message']['text'])){
+            		}else if(preg_match('/\/cazar\s(\d+\.\d+\.\d+\.\d+)/', $update['message']['text'])){
                       
             		  preg_match_all('/(\d+\.\d+\.\d+\.\d+)/',$update['message']['text'], $matches);
                       $this->sendMessage(MYID,"Empieza la caza!");
@@ -95,10 +134,18 @@ Class Bot{
                       $Query->moveTo($matches[0][0],"denegate");
                       $Query->deleteTo($matches[0][0],"blocks");
                       //Empiza el bonus
+                      sleep(1);
                       $this->sendMessage(MYID,"Objetivo Identificado");
+                      sleep(1);
                       $this->sendMessage(MYID,"Objetivo Abatido!");
 
-            		}else{
+            		}elseif(preg_match('/\/more\s(\d+\.\d+\.\d+\.\d+)/', $update['message']['text'])){
+                      preg_match_all('/\/more\s(\d+\.\d+\.\d+\.\d+)/',$update['message']['text'], $matches);
+
+                      // Consulta en la Base de Datos, la información de un Intruso.
+                      $blackdata = $Query->seeBlacklist($matches[0][0]);
+                      $this->sendMessage(MYID,$blackdata);
+                }else{
                       $this->sendMessage(MYID,"Comando incorrecto. Prueba con /help.");
             		}
             		break;

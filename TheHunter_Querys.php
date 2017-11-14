@@ -292,6 +292,80 @@ Class HQuery{
     return $pid;
   }
 
+
+
+  // *Función que devuelve todas las IP's de la Blacklist.
+  public function dumpFrom($where){
+    $ips = null;
+    $db = $this->database();
+
+    try{    
+      
+      // Parseando según la solicitud.
+      if(strcmp($where, "whitelist") == 0){
+        $query = "SELECT ip FROM Friends";
+      }elseif(strcmp($where, "blocks") == 0){
+        $query = "SELECT ip FROM Blocks";
+      }elseif(strcmp($where, "blacklist") == 0){
+        $query = "SELECT ip FROM Intruders";
+      }
+
+      $statement = $db->prepare($query);
+
+      $statement->execute();
+      $resultado = $statement->fetchAll();
+
+      $len = sizeof($resultado);
+
+      if($len > 0){
+        for ($i=0; $i < $len; $i++) { 
+          $ips .= "Cliente: ".$resultado[$i]["ip"]."\n";
+        }
+      }
+
+    }catch(PDOException $exception){
+      print 'Error ' . $exception -> getMessage(); 
+    }
+
+    // Cerrando la conexion.
+    $this->closedb($statement);
+
+    return $ips;
+  }
+
+
+
+  // *Función que devuelve información de un Intruso.
+  public function seeBlacklist($ip){
+    $pid = null;
+    $db = $this->database();
+
+    try{    
+
+      $query = "SELECT * FROM Intruders WHERE ip=:ip";
+
+      $statement = $db->prepare($query);
+
+      // Bindear los parametros para prevenir SQLi.
+      $statement->bindParam(':ip',$ip, PDO::PARAM_STR);
+
+      $statement->execute();
+      $resultado = $statement->fetchAll();
+
+      print_r($resultado);
+
+    }catch(PDOException $exception){
+      print 'Error ' . $exception -> getMessage(); 
+    }
+
+    // Cerrando la conexion.
+    $this->closedb($statement);
+
+    return "prueba";
+  }
+
+
+
 }
 
 ?>
