@@ -150,8 +150,8 @@ if(preg_match('/(\d+\.\d+\.\d+\.\d+\/\d+)/', $ip_to_nmap)){
   	      $Bot->sendMessage(MYID,$msg);
 
   	      // Parseando cada opción que mandar al administrador.
-  	      $content = array("✅ Verificar ".$user_data[1][$i],"🚫 Denegar ".$user_data[1][$i]);
-          $content2 = array("😈 Empieza la caza de ".$user_data[1][$i]);
+  	      $content = array("/verificar ".$user_data[1][$i],"/denegar ".$user_data[1][$i]);
+          $content2 = array("/cazar ".$user_data[1][$i]);
           array_push($replyMarkup['keyboard'], $content);
           array_push($replyMarkup['keyboard'], $content2);
 
