@@ -85,6 +85,56 @@ Class TheHunter{
   }
 
 
+  // *Función que obtiene los puertos de un escaneo a una IP.
+  public function getPorts($ip,$Query){
+    $portsdb = null;
+    $portsdata = null;
+    
+    try{
+
+      // Validando el valor recibido como 'IP'.
+      if(preg_match('/(\d+\.\d+\.\d+\.\d+)/', $ip)){
+        $command = "sudo nmap -F -O -oG - ".$ip;
+        $command = trim(preg_replace('/\s\s+/', ' ', $command));
+
+        $ports = shell_exec($command);
+
+        preg_match_all('/(\d+)\/(\w+)\/(\w+)\/\/(.*?)\/\/\//', $ports, $matches);
+        
+        if(sizeof($matches) > 1){
+          for ($i=0; $i < sizeof($matches[1]); $i++) { 
+            if(strcmp($matches[2][$i], "open") == 0){
+              $portsdb .= $matches[1][$i]." ";
+              $portsdata .= $matches[4][$i].", ";
+            }
+          }
+        }
+        //print_r($matches);
+
+        //echo "\nOpen Ports{".$portsdb."}\n";
+        
+        // Mandando los datos extraidos a la BD.
+        if((strlen($portsdb) > 2) && (strlen($portsdata) > 2)){
+          $Query->haveHunted($ip,$portsdb,"ports");
+          $Query->haveHunted($ip,$portsdata,"portsdata");
+        }
+
+        preg_match_all('/OS:\s(.*?)\s/', $ports, $matches1);
+
+        // Mandando el Sistema Operativo a la BD.
+        if(sizeof($matches1) > 1){
+          $Query->haveHunted($ip,$matches1[1][0],"os");
+        }
+
+      }else{
+        throw new Exception("Error, IP Format incorrect", 1);
+      }
+    }catch(PDOException $exception){
+      print 'Error ' . $exception -> getMessage(); 
+    }
+  }
+
+//
 
 } // Fin Clase TheHunter
 
