@@ -104,7 +104,7 @@ Class TheHunter{
         if(sizeof($matches) > 1){
           for ($i=0; $i < sizeof($matches[1]); $i++) { 
             if(strcmp($matches[2][$i], "open") == 0){
-              $portsdb .= $matches[1][$i]." ";
+              $portsdb .= $matches[1][$i].", ";
               $portsdata .= $matches[4][$i].", ";
             }
           }
