@@ -208,7 +208,7 @@ Class HQuery{
       if(strcmp($mode, "verify") == 0){
       	$query = "INSERT INTO Friends (ip,mac,marca) SELECT ip,mac,marca FROM Blocks WHERE ip=:ip";
       }elseif(strcmp($mode, "denegate") == 0){
-      	$query = "INSERT INTO Intruders (ip,mac,marca) SELECT ip,mac,marca FROM Blocks WHERE ip=:ip";
+      	$query = "INSERT INTO Intruders (ip,mac,marca,pid) SELECT ip,mac,marca,pid FROM Blocks WHERE ip=:ip";
       }else{
       	throw new Exception("Error Processing Request Mode", 1);
       }
@@ -335,13 +335,68 @@ Class HQuery{
 
 
 
-  // *Función que devuelve información de un Intruso.
-  public function seeBlacklist($ip){
-    $pid = null;
+  // *Función que introduce en la BD los valores obtenidos del análisis al intruso.
+  public function haveHunted($ip,$content,$datacod){
+    $query = null;
+
+    $db = $this->database();
+
+    try{
+
+      // Parseando que valores tienen que ingresarse en el Análisis del Intruso.
+      if(strcmp($datacod, "ports") == 0){
+
+        $query = "UPDATE Intruders SET ports=:ports WHERE ip=:ip";
+
+        $statement = $db->prepare($query);
+        // Bindear los parametros para prevenir SQLi.
+        $statement->bindParam(':ports',$content, PDO::PARAM_STR);
+
+      }elseif(strcmp($datacod, "portsdata") == 0){
+        
+        $query = "UPDATE Intruders SET portsdata=:portsdata WHERE ip=:ip";
+        
+        $statement = $db->prepare($query);        
+        // Bindear los parametros para prevenir SQLi.
+        $statement->bindParam(':portsdata',$content, PDO::PARAM_STR);
+
+      }elseif(strcmp($datacod, "os") == 0){
+        
+        $query = "UPDATE Intruders SET so=:so WHERE ip=:ip";
+
+        $statement = $db->prepare($query);        
+        // Bindear los parametros para prevenir SQLi.
+        $statement->bindParam(':so',$content, PDO::PARAM_STR);
+
+      }elseif(strcmp($datacod, "hostname") == 0){
+        
+        $query = "UPDATE Intruders SET hostname=:hostname WHERE ip=:ip";
+        
+        $statement = $db->prepare($query);        
+        // Bindear los parametros para prevenir SQLi.
+        $statement->bindParam(':hostname',$content, PDO::PARAM_STR);
+      } 
+
+      $statement->bindParam(':ip',$ip, PDO::PARAM_STR);
+
+      $statement->execute();
+
+    }catch(PDOException $exception){
+      print 'Error ' . $exception -> getMessage(); 
+    }
+
+    // Cerrando la conexion.
+    $this->closedb($statement);     
+  }
+
+
+  // *Función que devuelve datos de una IP de la Blacklist.
+  public function giveDataIntruder($ip){
+    $data = null;
     $db = $this->database();
 
     try{    
-
+      
       $query = "SELECT * FROM Intruders WHERE ip=:ip";
 
       $statement = $db->prepare($query);
@@ -352,7 +407,11 @@ Class HQuery{
       $statement->execute();
       $resultado = $statement->fetchAll();
 
-      print_r($resultado);
+      //print_r($resultado);
+      
+      if($resultado[0] > 1){
+        $data = "IP: ".$resultado[0]["ip"]."\nMac: ".$resultado[0]["mac"]."\nMarca: ".$resultado[0]["marca"]."\nHostname: ".$resultado[0]["hostname"]."\nPuertos: ".$resultado[0]["ports"]."\nInfo Puertos: ".$resultado[0]["portsdata"]."\nSistema Operativo: ".$resultado[0]["so"]."\n";
+      } 
 
     }catch(PDOException $exception){
       print 'Error ' . $exception -> getMessage(); 
@@ -361,7 +420,7 @@ Class HQuery{
     // Cerrando la conexion.
     $this->closedb($statement);
 
-    return "prueba";
+    return $data;
   }
 
 
