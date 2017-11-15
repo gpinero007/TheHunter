@@ -111,10 +111,15 @@ Class Bot{
 
                       // Ctrl+X al Cliente de Blocks a Friends.
                       $pid = $Query->retrievePID($matches[0][0]);
-                      $Query->moveTo($matches[0][0],"verify");
-                      $Query->deleteTo($matches[0][0],"blocks");
-                      $Hunter->stopPoisoning($pid);
-                      $this->sendMessage(MYID,"Cliente Verificado 👍🏻");
+
+                      if($pid == null){
+                        $this->sendMessage(MYID,"Cliente no encontrado en la lista de Bloqueados");
+                      }else{
+                        $Query->moveTo($matches[0][0],"verify");
+                        $Query->deleteTo($matches[0][0],"blocks");
+                        $Hunter->stopPoisoning($pid);
+                        $this->sendMessage(MYID,"Cliente Verificado 👍🏻");
+                      }
 
             		}else if(preg_match('/\/denegar\s+(\d+\.\d+\.\d+\.\d+)/', $update['message']['text'])){
                       
@@ -128,25 +133,22 @@ Class Bot{
             		}else if(preg_match('/\/cazar\s(\d+\.\d+\.\d+\.\d+)/', $update['message']['text'])){
                       
             		  preg_match_all('/(\d+\.\d+\.\d+\.\d+)/',$update['message']['text'], $matches);
-                      $this->sendMessage(MYID,"Empieza la caza!");
+                      $this->sendMessage(MYID,"😈 Empieza la caza!");
 
                       // Ctrl+X al Cliente de Blocks a Intruders. (+ Bonus Extra)
                       $Query->moveTo($matches[0][0],"denegate");
                       $Query->deleteTo($matches[0][0],"blocks");
-                      //Empiza el bonus
-                      sleep(1);
-                      $this->sendMessage(MYID,"Objetivo Identificado");
-                      sleep(1);
-                      $this->sendMessage(MYID,"Objetivo Abatido!");
 
-            		}elseif(preg_match('/\/more\s(\d+\.\d+\.\d+\.\d+)/', $update['message']['text'])){
-                      preg_match_all('/\/more\s(\d+\.\d+\.\d+\.\d+)/',$update['message']['text'], $matches);
+                      // Obitiene los Puertos abiertos del Objetivo.
+                      $Hunter->getPorts($matches[0][0],$Query);
+                      $data = $Query->giveDataIntruder($matches[0][0]);
 
-                      // Consulta en la Base de Datos, la información de un Intruso.
-                      $blackdata = $Query->seeBlacklist($matches[0][0]);
-                      $this->sendMessage(MYID,$blackdata);
-                }else{
-                      $this->sendMessage(MYID,"Comando incorrecto. Prueba con /help.");
+                      $this->sendMessage(MYID,"😜 Objetivo Identificado\n".$data);
+
+                      //$this->sendMessage(MYID,"Objetivo Abatido!");
+
+            		}else{
+                      $this->sendMessage(MYID,"❌ Comando incorrecto. Prueba con /help.");
             		}
             		break;
             }
