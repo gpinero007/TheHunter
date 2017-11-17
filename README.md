@@ -7,7 +7,7 @@ accesos y para esperar instrucciones.
 
 
 ## Requerimientos:
-**Arch Linux**
+:skull:**Arch Linux**
    * Nmap
    * Dsniff
    * MariaDB
@@ -15,7 +15,7 @@ accesos y para esperar instrucciones.
  
 ``` sudo pacman -S nmap dsniff mariadb php php-curl ```
 
-**Debian**
+:cyclone:**Debian**
    * Nmap
    * Dsniff
    * MariaDB
@@ -30,15 +30,18 @@ Por si no tenías una base de datos...
 
 ```sudo mysql_secure_installation```
 
-[Seguir los pasos de Instalación...](https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mysql-php-lamp-stack-on-debian)
+Seguir los pasos de Instalación [aquí](https://www.digitalocean.com/community/tutorials/how-to-install-linux-apache-mysql-php-lamp-stack-on-debian)
 
-**DEBIAN:** ```sudo service mysql start```
+:cyclone:**DEBIAN:**<br>
+```sudo service mysql start```
 
-**ARCH LINUX:** ```sudo systemctl start mysqld```
+:skull:**ARCH LINUX:**<br>
+```sudo systemctl start mysqld```
 
+Ahora entramos entramos en la Base de Datos:<br>
 ```mysql -u root -p```
 
-__Y en la Base de datos:__
+_Y en la Base de datos:_
 ```
 MariaDB [(none)]> CREATE DATABASE Hunter;
 
@@ -57,3 +60,23 @@ MariaDB [Hunter]> CREATE TABLE IF NOT EXISTS Intruders (id INT(10) PRIMARY KEY A
 
 MariaDB [Hunter]> SHOW TABLES;  
 ```
+## :imp: Empezando a Cazar!
+Tenemos los 4 archivos:
+ * TheHunter.php
+ * TheHunter_Bot.php
+ * TheHunter_Intruder.php
+ * TheHunter_Querys.php
+ 
+ Sólo vamos a ejecutar los dos primeros. El **primero** se encarga de _realizar escaneos de la red continuos e informar de nuevos clientes, además de mantenerlos en bloqueados_. Y el **segundo** es el :alien:_Bot que se comunicará mediante Telegram con el administrador de la Red_, especificado su ID en ambos programas en la cabecera. 
+ 
+ Para ello en una terminal nos dirigimos a la ruta del Hunter:<br>
+ ```sudo php TheHunter_Bot.php```
+ <br>Y en otra terminal (Ctrl+Shift+T) escribimos:<br>
+ ```sudo php TheHunter.php```
+ 
+ <br>También podemos dejarlos en segundo plano mediante:<br>
+ ```sudo php TheHunter.php &```
+ <br><br>Y matar el proceso o pararlo mediante:<br>
+ ```sudo kill -9 PID``` (sustituyendo PID por el número del proceso que tenga)
+ <br> Puedes consultar el PID mediante:<br>
+ ```ps aux|grep "sudo php TheHunter_Bot.php"| awk {'print $2'}``` (el primer número obtenido)
