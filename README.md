@@ -80,3 +80,5 @@ Tenemos los 4 archivos:
  ```sudo kill -9 PID``` (sustituyendo PID por el número del proceso que tenga)
  <br> Puedes consultar el PID mediante:<br>
  ```ps aux|grep "sudo php TheHunter_Bot.php"| awk {'print $2'}``` (el primer número obtenido)
+ 
+ <br>:books: No te olvides echar un vistazo a la **Documentación** que hay subida.
