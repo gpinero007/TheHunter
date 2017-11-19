@@ -11,6 +11,8 @@
  *
  *#############################################################*/
 
+
+
 Class TheHunter{
 
 
@@ -21,6 +23,15 @@ Class TheHunter{
     $ip_to_nmap = trim(preg_replace('/\s\s+/', ' ', $ip_to_nmap));
     return $ip_to_nmap;
   }
+
+
+
+  // *Función que obtiene la interfaz de red a utilizar.
+  public function getInterface(){
+    $interface = shell_exec("ip route | grep kernel | awk {'print $3'}");
+    $interface = trim(preg_replace('/\s\s+/', ' ', $interface));
+    return $interface;
+  }  
 
 
 
@@ -36,6 +47,7 @@ Class TheHunter{
   // *Función que hace ArpSpoofing a una dirección IP, por consiguiente, se le impide navegar.
   public function makeArpSpoofing($user_ip){
   	$ap_ip = $this->getApIP();
+    $interface = $this->getInterface();
   	$pid = 0;
   
     try{
@@ -44,7 +56,7 @@ Class TheHunter{
   	   * luego poder matar el proceso en el caso de que el administrador lo autentifique.
        */
   	  if((preg_match('/(\d+\.\d+\.\d+\.\d+)/', $user_ip)) && (preg_match('/(\d+\.\d+\.\d+\.\d+)/', $ap_ip)) ){
-  	    $command = "nohup arpspoof -i wlp2s0 -t ".$user_ip." ".$ap_ip." > /dev/null 2>&1 & echo $!";
+  	    $command = "nohup arpspoof -i ".$interface." -t ".$user_ip." ".$ap_ip." > /dev/null 2>&1 & echo $!";
   	    $command = trim(preg_replace('/\s\s+/', ' ', $command));
     
         $pid = shell_exec($command);
