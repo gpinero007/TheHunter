@@ -96,7 +96,15 @@ Class Bot{
                   $msg = $msg.$blackIps;
                 }
                 $this->sendMessage(MYID,$msg);
-                break;  
+                break;
+
+              case '/poweroff':
+                // Apagando y cerrando todo
+                $msg = "Matando procesos y cerrando el Programa"; 
+                $this->sendMessage(MYID,$msg);
+                shell_exec('sudo killall arpspoof');
+                shell_exec('sudo killall php');
+                exit(0);  
 
             	default:
             	  /*
